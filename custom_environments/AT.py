@@ -4,28 +4,6 @@ import numpy as np
 import DataSet
 
 
-
-
-
-import os
-from typing import Tuple
-import torch
-#import torch.nn as nn
-#import torchvision
-
-from torch.utils.data import TensorDataset, DataLoader
-
-from tqdm import tqdm
-import numpy as np
-from skimage.transform import resize
-from sklearn.utils import shuffle
-import pandas as pd
-
-
-
-
-
-
 #globals
 
 g_nStocks         = 1
@@ -40,30 +18,6 @@ g_maxMoves        = g_eventsPerDay * g_maxDaysToPlay
 g_nFeatures       = g_samples
 
 g_action_space = list( range(2) )
-
-
-def prepare_dataloader() -> Tuple[torch.utils.data.DataLoader]:
-    # Prepare DataLoader
-    path = '../data/AT/XTotal1.at.gz'
-    pathY = path.replace(".at", ".price.at")
-
-    npX = np.load(path)
-    npY = np.load(pathY)
-
-
-    #download and load training data
-    BATCH_SIZE = 20
-    trainloader = DataLoader(npX,
-                             batch_size=BATCH_SIZE,
-                             drop_last=True,
-                             shuffle=False,
-                             num_workers=4)
-    validloader = DataLoader(npY,
-                             batch_size=BATCH_SIZE,
-                             drop_last=True,
-                             shuffle=False,
-                             num_workers=4)
-    return trainloader, validloader
 
 
 class ATEnv:
