@@ -1,7 +1,7 @@
+data/AT/
 *.at
 runs/
 remove/
 __pycache__/
 *.swp
-data/XTotal1.at
-data/XTotal1.price.at
+XTot*.gz
