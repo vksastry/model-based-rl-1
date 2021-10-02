@@ -43,15 +43,7 @@ g_action_space = list( range(2) )
 
 
 def prepare_dataloader() -> Tuple[torch.utils.data.DataLoader]:
-    # load data
-
-    # define path for saved model
-    path = os.getcwd()
-
-    MODEL_SAVE_PATH = path + '/trained_model/'
-    if (not os.path.isdir(MODEL_SAVE_PATH)):
-        os.mkdir(MODEL_SAVE_PATH)
-
+    # Prepare DataLoader
     path = '../data/XTotal1.at'
     pathY = path.replace(".at", ".price.at")
 
