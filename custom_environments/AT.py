@@ -47,10 +47,9 @@ class ATEnv:
         # There is only one stock at a time being played.
         # Call AT to generate the list of closing prices for each stock
         training = True
-        self.closes = self.data.getPrices(training)
 
         # Get the features as a list of one DF per stock make sure the order is the same
-        self.featuresDf = self.data.getFeatures(training)
+        self.featuresDf, self.dfCloses = self.data.getFeaturesAndPrices(training)
 
         self.max = self.data.getSize(training) - 1
 
@@ -110,10 +109,10 @@ class ATEnv:
         else:
             haveStock = True
 
-        #historicClose = self.closes.loc[self.time, 'historic_close']
-        #futureClose   = self.closes.loc[self.time, 'future_close']
-        #gain          = self.closes.loc[self.time, 'gain']
-        score         = self.closes.loc[self.time, 'score']
+        #historicClose = self.dfCloses.loc[self.time, 'historic_close']
+        #futureClose   = self.dfCloses.loc[self.time, 'future_close']
+        #gain          = self.dfCloses.loc[self.time, 'gain']
+        score         = self.dfCloses.loc[self.time, 'score']
 
         if haveStock:
             # A gain is a gain.  A loss is a loss.
@@ -136,10 +135,7 @@ class ATEnv:
         return reward
 
 
-
-    # TODO:  Try to scale gain between +/-1
-
-
+    # TODO:  Basically scale gain between +/-1.  It is pretty close now.
     def getRewardAdjustedGain(self):
         # sourcery skip: assign-if-exp, inline-immediately-returned-variable
         """Get the reward for the last move."""
@@ -149,7 +145,7 @@ class ATEnv:
         else:
             multiplier = 1
 
-        score         = self.closes.loc[self.time, 'score']
+        score         = self.dfCloses.loc[self.time, 'score']
         reward = score * multiplier
 
         return reward
@@ -170,8 +166,7 @@ class ATEnv:
         """What does this do?."""
         if status:
             training        = False
-            self.closes     = self.data.getPrices(training)
-            self.featuresDf = self.data.getFeatures(training)
+            self.featuresDf, self.dfCloses = self.data.getFeaturesAndPrices(training)
             self.max        = self.data.getSize(training) - 1
             self.reset(withObservation=False)
 

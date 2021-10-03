@@ -29,21 +29,29 @@ import numpy as np
 
 def prepare_dataloader() -> Tuple[torch.utils.data.DataLoader]:
     # Prepare DataLoader
-    path = '../data/AT/XTotal1.at.gz'
-    pathY = path.replace(".at", ".price.at")
+    pathX = './data/AT/XTotal2.at'
+    pathY = pathX.replace(".at", ".price.at")
 
-    npX = np.load(path)
-    npY = np.load(pathY)
+    dfX = pd.read_csv(pathX)
+    dfY = pd.read_csv(pathY, header=None, names=['historic_close', 'future_close'])
+    dfY['gain'] = dfY['future_close'] / dfY['historic_close']
+
+    useNormalGain = True
+    if useNormalGain:
+        dfY['score'] = dfY['gain']
+    else:
+        # Subracting 1 from 'gain' to make losses negative.
+        dfY['score'] = dfY['gain'].sub(1)
 
 
     #download and load training data
     BATCH_SIZE = 20
-    trainloader = DataLoader(npX,
+    trainloader = DataLoader(dfX,
                              batch_size=BATCH_SIZE,
                              drop_last=True,
                              shuffle=False,
                              num_workers=4)
-    validloader = DataLoader(npY,
+    validloader = DataLoader(dfY,
                              batch_size=BATCH_SIZE,
                              drop_last=True,
                              shuffle=False,
@@ -63,26 +71,28 @@ class DataSet:
 
     def getFeaturesAndPrices(self, train):
         """Get feature data."""
+        columns = ['historic_close', 'future_close', 'gain', 'score']
+
         if train:
-
-
             # Is this a batch?  Yes.  Does the old code do a batch?  Yes.
-            (self.train_features, self.dfYTrain) = next(self.train_loader)
-            self.trainSize = len(self.train_features)
+            (xTrain, yTrain) = next(self.train_loader)
+            self.trainSize = len(xTrain)
 
-            # TODO: Convert to DataFrames
-
-            return self.train_features, self.dfYTrain
+            # Convert to DataFrames
+            dfXTrain = pd.DataFrame(xTrain)
+            dfYTrain = pd.DataFrame(yTrain, columns=columns)
+            print('dfYTrain.head(): ', dfYTrain.head())
+            input('Press <Enter> to continue')
+            return dfXTrain, dfYTrain
         else:
-
-
             # Is this a batch?  Yes.  Does the old code do a batch?  Yes.
-            (self.test_features, self.dfYTest)  = next(self.test_loader)
-            self.testSize = len(self.test_features)
+            (xTest, yTest)  = next(self.test_loader)
+            self.testSize = len(xTest)
 
             # TODO: Convert to DataFrames
-
-            return self.test_features, self.dfYTest
+            dfXTest = pd.DataFrame(xTest)
+            dfYTest = pd.DataFrame(yTest, columns=columns)
+            return dfXTest, dfYTest
 
     def getSize(self, train):
         """Get size of the data."""
