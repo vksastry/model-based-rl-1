@@ -106,6 +106,7 @@ class DataSet:
                 xTrain, yTrain = next(iter(self.train_loader))
             except StopIteration:
                 self.train_loader, self.test_loader = prepare_dataloader()
+                xTrain, yTrain = next(iter(self.train_loader))
 
 
             self.trainSize = len(xTrain)
