@@ -91,7 +91,7 @@ class DataSet:
 
     def __init__(self, maxMoves, useNormalGain=True):
         """Initialize the data set."""
-        print('__init__.maxMoves: ', maxMoves)
+        #print('__init__.maxMoves: ', maxMoves)
 
         self.train_loader, self.test_loader = prepare_dataloader(maxMoves)
         self.trainSize = None
@@ -115,8 +115,9 @@ class DataSet:
 
             # Convert to DataFrames
             dfXTrain = pd.DataFrame(xTrain)
+            #print('dfXTrain.shape: ', dfXTrain.shape)
             dfYTrain = pd.DataFrame(yTrain, columns=columns)
-            #print('dfYTrain.head(): ', dfYTrain.head())
+            #print('dfYTrain.shape: ', dfYTrain.shape)
             #input('Press <Enter> to continue')
             return dfXTrain, dfYTrain
         else:
