@@ -68,7 +68,7 @@ def prepare_dataloader() -> Tuple[torch.utils.data.DataLoader]:
 
 
     #download and load training data
-    BATCH_SIZE = 400
+    BATCH_SIZE = 950
     trainloader = DataLoader(train_data,
                              batch_size=BATCH_SIZE,
                              drop_last=True,
