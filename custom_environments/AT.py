@@ -18,7 +18,7 @@ g_maxMoves        = g_eventsPerDay * g_maxDaysToPlay
 #
 # TODO:  This must be fixed.
 #
-g_maxMoves        = 20
+g_maxMoves        = 5
 
 g_nFeatures       = g_samples
 
