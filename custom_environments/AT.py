@@ -14,16 +14,6 @@ import torch
 #import torchvision
 
 
-"""
-from torch.utils.data import TensorDataset, DataLoader
-
-from tqdm import tqdm
-import numpy as np
-from skimage.transform import resize
-from sklearn.utils import shuffle
-import pandas as pd
-"""
-
 
 
 
