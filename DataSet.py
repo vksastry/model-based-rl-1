@@ -53,7 +53,8 @@ class DataSet:
             # Subracting 1 from 'gain' to make losses negative.
             self.dfY['score'] = self.dfY['gain'].sub(1)
 
-        print('collectData.dfFeatures.head(): ', dfFeatures.head())
+        #print('collectData.dfFeatures.head(): ', dfFeatures.head())
+        print('collectData.dfFeatures.shape: ', dfFeatures.shape)
         return dfFeatures
 
 
