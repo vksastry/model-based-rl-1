@@ -15,6 +15,11 @@ g_samples = g_samplesPerEvent * g_eventsPerDay * g_daysOfHistory
 g_maxDaysToPlay   = 30
 g_maxMoves        = g_eventsPerDay * g_maxDaysToPlay
 
+#
+# TODO:  This must be fixed.
+#
+g_maxMoves        = 20
+
 g_nFeatures       = g_samples
 
 g_action_space = list( range(2) )
