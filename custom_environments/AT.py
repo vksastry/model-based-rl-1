@@ -13,6 +13,8 @@ g_daysOfHistory   = 22
 g_samples = g_samplesPerEvent * g_eventsPerDay * g_daysOfHistory
 
 g_maxDaysToPlay   = 30
+# TODO:  Try only ten days.  Got a different error.
+#g_maxDaysToPlay   = 10
 g_maxMoves        = g_eventsPerDay * g_maxDaysToPlay
 
 g_nFeatures       = g_samples
