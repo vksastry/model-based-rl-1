@@ -50,7 +50,7 @@ def getData(pathX):
     return train_data
 
 
-def prepare_dataloader() -> Tuple[torch.utils.data.DataLoader]:
+def prepare_dataloader(maxMoves) -> Tuple[torch.utils.data.DataLoader]:
     # Prepare DataLoader
     pathX = './data/AT/XTotal2A.at'
     train_data = getData(pathX)
@@ -68,7 +68,7 @@ def prepare_dataloader() -> Tuple[torch.utils.data.DataLoader]:
 
 
     #download and load training data
-    BATCH_SIZE = 20
+    BATCH_SIZE = maxMoves
     trainloader = DataLoader(train_data,
                              batch_size=BATCH_SIZE,
                              drop_last=True,
@@ -91,7 +91,9 @@ class DataSet:
 
     def __init__(self, maxMoves, useNormalGain=True):
         """Initialize the data set."""
-        self.train_loader, self.test_loader = prepare_dataloader()
+        print('__init__.maxMoves: ', maxMoves)
+
+        self.train_loader, self.test_loader = prepare_dataloader(maxMoves)
         self.trainSize = None
         self.testSize = None
 
