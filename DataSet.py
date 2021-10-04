@@ -10,6 +10,8 @@ class DataSet:
 
     def __init__(self, maxMoves, useNormalGain=True):
         """Initialize the data set."""
+        print('__init__.maxMoves: ', maxMoves)
+
         self.useNormalGain = useNormalGain
         self.split = 0.8
         dfFeatures = self.collectData(maxMoves)
@@ -51,6 +53,7 @@ class DataSet:
             # Subracting 1 from 'gain' to make losses negative.
             self.dfY['score'] = self.dfY['gain'].sub(1)
 
+        print('collectData.dfFeatures.head(): ', dfFeatures.head())
         return dfFeatures
 
 
