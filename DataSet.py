@@ -16,7 +16,7 @@ class DataSet:
         self.splitData(dfFeatures, maxMoves)
 
 
-    def collectData(self, maxMoves, pattern='data/XTotal*.at'):
+    def collectData(self, maxMoves, pattern='data/AT/XTotal*.at'):
         """Collect data."""
         files = [file for file in glob.glob(pattern)]
 

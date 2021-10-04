@@ -13,6 +13,8 @@ import torch
 #import torch.nn as nn
 #import torchvision
 
+
+"""
 from torch.utils.data import TensorDataset, DataLoader
 
 from tqdm import tqdm
@@ -20,6 +22,7 @@ import numpy as np
 from skimage.transform import resize
 from sklearn.utils import shuffle
 import pandas as pd
+"""
 
 
 
@@ -40,109 +43,6 @@ g_maxMoves        = g_eventsPerDay * g_maxDaysToPlay
 g_nFeatures       = g_samples
 
 g_action_space = list( range(2) )
-
-
-def prepare_dataloader() -> Tuple[torch.utils.data.DataLoader]:
-    # load data
-
-    # define path for saved model
-    path = os.getcwd()
-
-    MODEL_SAVE_PATH = path + '/trained_model/'
-    if (not os.path.isdir(MODEL_SAVE_PATH)):
-        os.mkdir(MODEL_SAVE_PATH)
-
-    path = '../data/XTotal1.at'
-    pathY = path.replace(".at", ".price.at")
-
-    dfFeatures = pd.read_csv(path, header=None)
-    dfY = pd.read_csv(pathY, header=None, names=['historic_close', 'future_close'])
-    dfY['gain'] = dfY['future_close'] / dfY['historic_close']
-
-    useNormalGain = True
-    if useNormalGain:
-        dfY['score'] = dfY['gain']
-    else:
-        # Subracting 1 from 'gain' to make losses negative.
-        dfY['score'] = dfY['gain'].sub(1)
-
-
-    # Save all of dfFeatures
-
-    # Save dfY but only one column.  But what to do with score?
-    # Can this be turned into a binary classification problem?
-    # Does it need to be?  The previous version was only based on gain.
-
-
-
-    print('numpy version: {np.__version__}')
-    allow_pickle = False
-    real_space = np.load(label_path, allow_pickle=allow_pickle)
-    data_diffr = np.load(data_path, allow_pickle=True)['arr_0']
-    amp = np.abs(real_space)
-    ph = np.angle(real_space)
-    print(amp.shape)
-    print(data_diffr.shape)
-
-    # crop diff to (64,64)
-    data_diffr_red = np.zeros(
-        (data_diffr.shape[0], data_diffr.shape[1], 64, 64), float)
-    for i in tqdm(range(data_diffr.shape[0])):
-        for j in range(data_diffr.shape[1]):
-            data_diffr_red[i, j] = resize(data_diffr[i, j, 32:-32, 32:-32],
-                                          (64, 64),
-                                          preserve_range=True,
-                                          anti_aliasing=True)
-            data_diffr_red[i, j] = np.where(data_diffr_red[i, j] < 3, 0,
-                                            data_diffr_red[i, j])
-
-    # split training and testing data
-    tst_strt = amp.shape[0] - NLTEST  #Where to index from
-    print(tst_strt)
-
-    X_train = data_diffr_red[:NLINES, :].reshape(-1, H, W)[:, np.newaxis, :, :]
-    Y_I_train = amp[:NLINES, :].reshape(-1, H, W)[:, np.newaxis, :, :]
-    Y_phi_train = ph[:NLINES, :].reshape(-1, H, W)[:, np.newaxis, :, :]
-
-    print(X_train.shape)
-
-    X_train, Y_I_train, Y_phi_train = shuffle(X_train,
-                                              Y_I_train,
-                                              Y_phi_train,
-                                              random_state=0)
-
-    #Training data
-    X_train_tensor = torch.Tensor(X_train)
-    Y_I_train_tensor = torch.Tensor(Y_I_train)
-    Y_phi_train_tensor = torch.Tensor(Y_phi_train)
-
-    print(Y_phi_train.max(), Y_phi_train.min())
-
-    print(X_train_tensor.shape, Y_I_train_tensor.shape,
-          Y_phi_train_tensor.shape)
-
-    train_data = TensorDataset(X_train_tensor, Y_I_train_tensor,
-                               Y_phi_train_tensor)
-
-    # split training and validation data
-    train_data2, valid_data = torch.utils.data.random_split(
-        train_data, [N_TRAIN - N_VALID, N_VALID])
-    print(len(train_data2), len(valid_data))  #, len(test_data)
-
-    #download and load training data
-    batch_size, drop_last
-    BATCH_SIZE = 20
-    trainloader = DataLoader(train_data2,
-                             batch_size=BATCH_SIZE,
-                             drop_last=True,
-                             shuffle=False,
-                             num_workers=4)
-    validloader = DataLoader(valid_data,
-                             batch_size=BATCH_SIZE,
-                             drop_last=True,
-                             shuffle=False,
-                             num_workers=4)
-    return trainloader, validloader
 
 
 class ATEnv:
