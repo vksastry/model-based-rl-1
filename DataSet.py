@@ -10,7 +10,7 @@ class DataSet:
 
     def __init__(self, maxMoves, useNormalGain=True):
         """Initialize the data set."""
-        print('__init__.maxMoves: ', maxMoves)
+        #print('__init__.maxMoves: ', maxMoves)
 
         self.useNormalGain = useNormalGain
         self.split = 0.8
@@ -33,9 +33,11 @@ class DataSet:
         self.dfY = pd.read_csv(pathY, header=None, names=['historic_close', 'future_close'])
 
         totalNumRows = len(self.dfY.index)
+        print(f'totalNumRows: {totalNumRows}')
         # Get enough for testing.
         numRowsRequired = maxMoves * (1 + (1 - self.split))
         numRowsRequired = int(numRowsRequired)
+        print(f'numRowsRequired: {numRowsRequired}')
 
         # Create a random starting point so that we don't always start at zero.
         startIndex = random.randint( 0, totalNumRows - numRowsRequired - 1 )
@@ -54,7 +56,7 @@ class DataSet:
             self.dfY['score'] = self.dfY['gain'].sub(1)
 
         #print('collectData.dfFeatures.head(): ', dfFeatures.head())
-        print('collectData.dfFeatures.shape: ', dfFeatures.shape)
+        #print('collectData.dfFeatures.shape: ', dfFeatures.shape)
         return dfFeatures
 
 
