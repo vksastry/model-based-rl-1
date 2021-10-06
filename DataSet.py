@@ -49,14 +49,17 @@ class DataSet:
 
         self.trainSize = maxMoves
         # Get enough for testing.
-        print(f'maxMoves: {maxMoves}')
+        #print(f'maxMoves: {maxMoves}')
         numRowsRequired = maxMoves
-        print(f'numRowsRequired: {numRowsRequired}')
+        #print(f'numRowsRequired: {numRowsRequired}')
 
         # Create a random starting point so that we don't always start at zero.
-        startIndex = random.randint( 0, totalRowsInTrainingArea - numRowsRequired - 1 )
+        trainingStartIndex = random.randint( 0, totalRowsInTrainingArea - numRowsRequired - 1 )
+        print(f'trainingStartIndex: {trainingStartIndex}')
 
         self.dfTrainFeatures = pd.read_csv(path, header=None, skiprows=startIndex, nrows=maxMoves)
+        #print(f'dfTrainFeatures.shape: {self.dfTrainFeatures.shape}')
+        assert self.dfTrainFeatures.shape[0] == maxMoves
 
         # Get Y data
         self.dfTrainY = pd.read_csv(pathY, header=None, skiprows=startIndex, nrows=maxMoves, names=['historic_close', 'future_close'])
@@ -67,6 +70,8 @@ class DataSet:
         else:
             # Subracting 1 from 'gain' to make losses negative.
             self.dfTrainY['score'] = self.dfTrainY['gain'].sub(1)
+        #print(f'dfTrainY.shape: {self.dfTrainY.shape}')
+        assert self.dfTrainY.shape[0] == maxMoves
 
 
 
@@ -78,11 +83,14 @@ class DataSet:
         totalRowsInTestingArea  = totalNumRows - totalRowsInTrainingArea
 
         # Create a random starting point so that we don't always start at the beginning.
-        startIndex = random.randint( 0, totalRowsInTestingArea - numRowsRequired - 1 )
+        testingStartIndex = random.randint( 0, totalRowsInTestingArea - numRowsRequired - 1 )
         # Step past rows in training area.
-        startIndex += totalRowsInTrainingArea
+        testingStartIndex += totalRowsInTrainingArea
+        print(f'testingStartIndex: {testingStartIndex}')
 
         self.dfTestFeatures = pd.read_csv(path, header=None, skiprows=startIndex, nrows=maxMoves)
+        #print(f'dfTestFeatures.shape: {self.dfTestFeatures.shape}')
+        assert self.dfTestFeatures.shape[0] == maxMoves
 
         # Get Y data
         self.dfTestY = pd.read_csv(pathY, header=None, skiprows=startIndex, nrows=maxMoves, names=['historic_close', 'future_close'])
@@ -93,6 +101,9 @@ class DataSet:
         else:
             # Subracting 1 from 'gain' to make losses negative.
             self.dfTestY['score'] = self.dfTestY['gain'].sub(1)
+        #print(f'dfTestY.shape: {self.dfTestY.shape}')
+        assert self.dfTestY.shape[0] == maxMoves
+        #input('Press <Enter> to continue...')
 
 
 
