@@ -55,14 +55,14 @@ class DataSet:
 
         # Create a random starting point so that we don't always start at zero.
         trainingStartIndex = random.randint( 0, totalRowsInTrainingArea - numRowsRequired - 1 )
-        print(f'trainingStartIndex: {trainingStartIndex}')
+        #print(f'trainingStartIndex: {trainingStartIndex}')
 
-        self.dfTrainFeatures = pd.read_csv(path, header=None, skiprows=startIndex, nrows=maxMoves)
+        self.dfTrainFeatures = pd.read_csv(path, header=None, skiprows=trainingStartIndex, nrows=maxMoves)
         #print(f'dfTrainFeatures.shape: {self.dfTrainFeatures.shape}')
         assert self.dfTrainFeatures.shape[0] == maxMoves
 
         # Get Y data
-        self.dfTrainY = pd.read_csv(pathY, header=None, skiprows=startIndex, nrows=maxMoves, names=['historic_close', 'future_close'])
+        self.dfTrainY = pd.read_csv(pathY, header=None, skiprows=trainingStartIndex, nrows=maxMoves, names=['historic_close', 'future_close'])
         self.dfTrainY['gain'] = self.dfTrainY['future_close'] / self.dfTrainY['historic_close']
 
         if self.useNormalGain:
@@ -86,14 +86,14 @@ class DataSet:
         testingStartIndex = random.randint( 0, totalRowsInTestingArea - numRowsRequired - 1 )
         # Step past rows in training area.
         testingStartIndex += totalRowsInTrainingArea
-        print(f'testingStartIndex: {testingStartIndex}')
+        #print(f'testingStartIndex: {testingStartIndex}')
 
-        self.dfTestFeatures = pd.read_csv(path, header=None, skiprows=startIndex, nrows=maxMoves)
+        self.dfTestFeatures = pd.read_csv(path, header=None, skiprows=testingStartIndex, nrows=maxMoves)
         #print(f'dfTestFeatures.shape: {self.dfTestFeatures.shape}')
         assert self.dfTestFeatures.shape[0] == maxMoves
 
         # Get Y data
-        self.dfTestY = pd.read_csv(pathY, header=None, skiprows=startIndex, nrows=maxMoves, names=['historic_close', 'future_close'])
+        self.dfTestY = pd.read_csv(pathY, header=None, skiprows=testingStartIndex, nrows=maxMoves, names=['historic_close', 'future_close'])
         self.dfTestY['gain'] = self.dfTestY['future_close'] / self.dfTestY['historic_close']
 
         if self.useNormalGain:
@@ -110,16 +110,16 @@ class DataSet:
     def getFeatures(self, train):
         """Get feature data."""
         if train:
-            return self.train_features
+            return self.dfTrainFeatures
         else:
-            return self.test_features
+            return self.dfTestFeatures
 
     def getPrices(self, train):
         """Get price data."""
         if train:
-            return self.dfY.head(self.trainSize)
+            return self.dfTrainY
         else:
-            return self.dfY.tail(self.test_features)
+            return self.dfTestY
 
     def getSize(self, train):
         """Get size of the data."""
