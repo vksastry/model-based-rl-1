@@ -15,11 +15,13 @@ class DataSet:
         self.useNormalGain = useNormalGain
         self.split = 0.8
         dfFeatures = self.collectData(maxMoves)
-        self.splitData(dfFeatures, maxMoves)
 
 
     def collectData(self, maxMoves, pattern='data/AT/XTotal*.at'):
         """Collect data."""
+        #
+        # Find files and size of data.
+        #
         files = [file for file in glob.glob(pattern)]
 
         # Keep files that do not contain '.price.'.
@@ -30,53 +32,68 @@ class DataSet:
         path = filesShortList[randomIndex]
         pathY = path.replace(".at", ".price.at")
 
-        self.dfY = pd.read_csv(pathY, header=None, names=['historic_close', 'future_close'])
+        # Use the Y data to get the total number of rows because the file is so 
+        # much smaller than features.
+        self.dfTempY = pd.read_csv(pathY, header=None)
 
-        totalNumRows = len(self.dfY.index)
+        totalNumRows = len(self.dfTempY.index)
         print(f'totalNumRows: {totalNumRows}')
+
+
+
+        #
+        # Select training data only from the first part of the data split.
+        #
+        totalRowsInTrainingArea = int(self.split * totalNumRows)
+        totalRowsInTestingArea  = totalNumRows - totalRowsInTrainingArea
+
+        self.trainSize = maxMoves
         # Get enough for testing.
-        numRowsRequired = maxMoves * (1 + (1 - self.split))
-        numRowsRequired = int(numRowsRequired)
+        print(f'maxMoves: {maxMoves}')
+        numRowsRequired = maxMoves
         print(f'numRowsRequired: {numRowsRequired}')
 
         # Create a random starting point so that we don't always start at zero.
-        startIndex = random.randint( 0, totalNumRows - numRowsRequired - 1 )
-        startIndex = 0
-        startIndex = random.randint( 0, 60 )
+        startIndex = random.randint( 0, totalRowsInTrainingArea - numRowsRequired - 1 )
 
-        dfFeatures = pd.read_csv(path, header=None, skiprows=startIndex, nrows=maxMoves)
+        self.dfTrainFeatures = pd.read_csv(path, header=None, skiprows=startIndex, nrows=maxMoves)
 
-        self.dfY = pd.read_csv(pathY, header=None, skiprows=startIndex, nrows=maxMoves, names=['historic_close', 'future_close'])
-        self.dfY['gain'] = self.dfY['future_close'] / self.dfY['historic_close']
+        # Get Y data
+        self.dfTrainY = pd.read_csv(pathY, header=None, skiprows=startIndex, nrows=maxMoves, names=['historic_close', 'future_close'])
+        self.dfTrainY['gain'] = self.dfTrainY['future_close'] / self.dfTrainY['historic_close']
 
         if self.useNormalGain:
-            self.dfY['score'] = self.dfY['gain']
+            self.dfTrainY['score'] = self.dfTrainY['gain']
         else:
             # Subracting 1 from 'gain' to make losses negative.
-            self.dfY['score'] = self.dfY['gain'].sub(1)
-
-        #print('collectData.dfFeatures.head(): ', dfFeatures.head())
-        #print('collectData.dfFeatures.shape: ', dfFeatures.shape)
-        return dfFeatures
+            self.dfTrainY['score'] = self.dfTrainY['gain'].sub(1)
 
 
-    def splitData(self, dfFeatures, maxMoves):
-        """Establish the data."""
-        self.dataSize = len(dfFeatures.index)
-        #print(f'self.dataSize: {self.dataSize}')
 
-        self.trainSize = maxMoves
-        self.testSize  = self.dataSize - self.trainSize
 
-        self.train_features = dfFeatures[:self.trainSize]
-        if len(self.train_features.index) != self.trainSize:
-            print(f'{len(self.train_features)} != {self.trainSize}')
-            input('train_features size mismatch with self.trainSize.  Press <Enter> to continue')
 
-        self.test_features = dfFeatures[self.trainSize:]
-        if len(self.test_features) != self.testSize:
-            print(f'{len(self.test_features)} != {self.testSize}')
-            input('test_features size mismatch with self.testSize. Press <Enter> to continue')
+        #
+        # Select testing data only from the last/second part of the data split.
+        #
+        totalRowsInTestingArea  = totalNumRows - totalRowsInTrainingArea
+
+        # Create a random starting point so that we don't always start at the beginning.
+        startIndex = random.randint( 0, totalRowsInTestingArea - numRowsRequired - 1 )
+        # Step past rows in training area.
+        startIndex += totalRowsInTrainingArea
+
+        self.dfTestFeatures = pd.read_csv(path, header=None, skiprows=startIndex, nrows=maxMoves)
+
+        # Get Y data
+        self.dfTestY = pd.read_csv(pathY, header=None, skiprows=startIndex, nrows=maxMoves, names=['historic_close', 'future_close'])
+        self.dfTestY['gain'] = self.dfTestY['future_close'] / self.dfTestY['historic_close']
+
+        if self.useNormalGain:
+            self.dfTestY['score'] = self.dfTestY['gain']
+        else:
+            # Subracting 1 from 'gain' to make losses negative.
+            self.dfTestY['score'] = self.dfTestY['gain'].sub(1)
+
 
 
     def getFeatures(self, train):
