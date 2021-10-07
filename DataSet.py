@@ -37,7 +37,7 @@ class DataSet:
         self.dfTempY = pd.read_csv(pathY, header=None)
 
         totalNumRows = len(self.dfTempY.index)
-        print(f'totalNumRows: {totalNumRows}')
+        #print(f'totalNumRows: {totalNumRows}')
 
 
 
